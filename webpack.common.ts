@@ -41,7 +41,9 @@ const commonConfig: Configuration = {
   },
   externals: [
     '@jujulego/jill',
+    '@swc/core',
     'react-devtools-core',
+    'typescript',
     'ws', // used only by ink for devtools
   ],
   plugins: [
