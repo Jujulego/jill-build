@@ -1,4 +1,4 @@
-import hello from './hello';
+import build from './build';
 
 // Commands
-export const commands = [hello];
+export const commands = [build];
