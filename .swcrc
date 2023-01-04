@@ -1,0 +1,26 @@
+{
+  "jsc": {
+    "target": "es2022",
+    "parser": {
+      "syntax": "typescript",
+      "decorators": true
+    },
+    "transform": {
+      "react": {
+        "runtime": "automatic"
+      }
+    },
+    "baseUrl": "./",
+    "paths": {
+      "@/src/*": ["src/*"],
+      "@/tools/*": ["tools/*"]
+    }
+  },
+  "module": {
+    "type": "es6"
+  },
+  "sourceMaps": true,
+  "env": {
+    "targets": "node 16"
+  }
+}
