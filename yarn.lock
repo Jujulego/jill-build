@@ -169,12 +169,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/jill@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@jujulego/jill@npm:2.1.0"
+"@jujulego/jill@npm:2.1.1":
+  version: 2.1.1
+  resolution: "@jujulego/jill@npm:2.1.1"
   bin:
     jill: ./bin/jill.js
-  checksum: 74316b1a52025c76960de42a4fbe752b78a3cd1f1fd4c40b9ff52e51a80dcba689eb689ac8b69a9e2ff0acbee7378389e2d761535199b77ea37573fb73f05e2a
+  checksum: 17e0a2114b707b92f5b24379d34419ea5a515a3c92d23be14b8792cce5fbbb0871b31f4ec4e74376d9106d202fc97d4d340dfe05c838a8d85e1348866b6b1029
   languageName: node
   linkType: hard
 
@@ -2384,7 +2384,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "jill-build@workspace:."
   dependencies:
-    "@jujulego/jill": 2.1.0
+    "@jujulego/jill": 2.1.1
     "@swc/core": 1.3.24
     "@types/node": 16.18.11
     "@types/react": 17.0.52
