@@ -1,9 +1,9 @@
-import { definePlugin } from '@jujulego/jill';
+import { Plugin } from '@jujulego/jill';
 
-import { commands } from './commands';
+import { BuildCommand } from './commands';
 
 // Plugin
-export default definePlugin({
-  builder: yargs =>
-    yargs.command(commands as any)
-});
+@Plugin({
+  commands: [BuildCommand]
+})
+export default class BuildPlugin {}
