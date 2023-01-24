@@ -1,8 +1,10 @@
-import { Command, ICommand, lazyCurrentWorkspace, LoadProject, LoadWorkspace, Workspace } from '@jujulego/jill';
+import { Command, type ICommand, lazyCurrentWorkspace, LoadProject, LoadWorkspace, type Workspace } from '@jujulego/jill';
 import * as swc from '@swc/core';
 import * as ts from 'typescript';
-import { ArgumentsCamelCase, type Argv } from 'yargs';
+import { type ArgumentsCamelCase, type Argv } from 'yargs';
 import path from 'node:path';
+
+import { LoadTsconfig } from '@/src/middlewares/load-tsconfig';
 
 // Types
 export interface IBuildCommandArgs {
@@ -13,7 +15,7 @@ export interface IBuildCommandArgs {
 @Command({
   command: 'build <file>',
   describe: 'Builds workspace',
-  middlewares: [LoadProject, LoadWorkspace]
+  middlewares: [LoadProject, LoadWorkspace, LoadTsconfig]
 })
 export class BuildCommand implements ICommand<IBuildCommandArgs> {
   // Lazy injections

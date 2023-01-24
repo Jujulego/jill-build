@@ -21,6 +21,10 @@
         "node": true
       },
       "rules": {
+        "@typescript-eslint/consistent-type-imports": ["error", {
+          "prefer": "type-imports",
+          "fixStyle": "inline-type-imports"
+        }],
         "quotes": ["error", "single"],
         "semi": ["error", "always"]
       }
