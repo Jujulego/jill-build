@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import { type ArgumentsCamelCase, type Argv } from 'yargs';
 import path from 'node:path';
 
-import { LoadTsconfig } from '@/src/middlewares/load-tsconfig';
+import { LazyTsconfig, LoadTsconfig } from '@/src/middlewares/load-tsconfig';
 
 // Types
 export interface IBuildCommandArgs {
@@ -19,6 +19,9 @@ export interface IBuildCommandArgs {
 })
 export class BuildCommand implements ICommand<IBuildCommandArgs> {
   // Lazy injections
+  @LazyTsconfig()
+  readonly tsconfig: ts.ParsedCommandLine;
+
   @lazyCurrentWorkspace()
   readonly workspace: Workspace;
 
@@ -37,17 +40,13 @@ export class BuildCommand implements ICommand<IBuildCommandArgs> {
     console.log(res);
 
     // Build using ts ==> https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
-    const configFilename = ts.findConfigFile(this.workspace.cwd, ts.sys.fileExists); // <= 3rd argument for other filename than tsconfig.json
-    const configFile = ts.readConfigFile(configFilename!, ts.sys.readFile);
-    const compilerOpts = ts.parseJsonConfigFileContent(configFile.config, ts.sys, this.workspace.cwd); // <= contains files "matched" by tsconfig (paths only)
+    this.tsconfig.options.noEmit = false;
+    this.tsconfig.options.emitDeclarationOnly = true;
 
-    compilerOpts.options.noEmit = false;
-    compilerOpts.options.emitDeclarationOnly = true;
-
-    const host = ts.createCompilerHost(compilerOpts.options);
+    const host = ts.createCompilerHost(this.tsconfig.options);
     host.writeFile = (filename, contents) => console.log({ filename, contents }); // <= file data
 
-    const program = ts.createProgram([path.resolve(this.workspace.cwd, args.file)], compilerOpts.options, host);
+    const program = ts.createProgram([path.resolve(this.workspace.cwd, args.file)], this.tsconfig.options, host);
     program.emit();
   }
 }

@@ -1,9 +1,10 @@
-import { container, CURRENT, type IMiddleware, Logger, Middleware, Workspace } from '@jujulego/jill';
-import { type interfaces as int } from 'inversify';
+import { container, type IMiddleware, lazyInject, Logger, Middleware } from '@jujulego/jill';
+import { inject, type interfaces as int } from 'inversify';
 import * as ts from 'typescript';
 import { type ArgumentsCamelCase, type Argv } from 'yargs';
 
-import { logDiagnostic } from '@/src/utils/typescript';
+import { ContextService } from '@/src/context.service';
+import { DiagnosticService } from '@/src/typescript/diagnostic.service';
 
 // Types
 export interface ILoadTsconfigArgs {
@@ -13,6 +14,11 @@ export interface ILoadTsconfigArgs {
 // Constants
 export const TSCONFIG: int.ServiceIdentifier<ts.ParsedCommandLine> = Symbol('jujulego:jill-build:tsconfig');
 
+// Decorators
+export function LazyTsconfig() {
+  return lazyInject(TSCONFIG);
+}
+
 // Middleware
 @Middleware()
 export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
@@ -20,8 +26,15 @@ export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
   private readonly logger: Logger;
 
   // Constructor
-  constructor() {
-    this.logger = container.get(Logger).child({ label: 'tsconfig' });
+  constructor(
+    @inject(Logger)
+    logger: Logger,
+    @inject(ContextService)
+    private readonly context: ContextService,
+    @inject(DiagnosticService)
+    private readonly diagnostics: DiagnosticService,
+  ) {
+    this.logger = logger.child({ label: 'tsconfig' });
   }
 
   // Methods
@@ -36,7 +49,7 @@ export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
 
   async handler(args: ArgumentsCamelCase<ILoadTsconfigArgs>): Promise<void> {
     // Locate tsconfig file
-    const filename = ts.findConfigFile(this.cwd, ts.sys.fileExists, args.tsconfig);
+    const filename = ts.findConfigFile(this.context.cwd, ts.sys.fileExists, args.tsconfig);
 
     if (!filename) {
       this.logger.error('Typescript config file not found !');
@@ -47,11 +60,18 @@ export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
 
     // Load tsconfig file
     const file = ts.readConfigFile(filename, ts.sys.readFile);
-    const config = ts.parseJsonConfigFileContent(file.config, ts.sys, this.cwd);
+
+    if (file.error) {
+      this.diagnostics.log(this.logger, file.error);
+      return process.exit(1);
+    }
+
+    // Parse config
+    const config = ts.parseJsonConfigFileContent(file.config, ts.sys, this.context.cwd);
 
     if (config.errors.length > 0) {
       for (const err of config.errors) {
-        logDiagnostic(this.logger, err);
+        this.diagnostics.log(this.logger, err);
       }
 
       if (config.errors.some(err => err.category === ts.DiagnosticCategory.Error)) {
@@ -60,18 +80,8 @@ export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
     }
 
     this.logger.verbose(`Loaded ${filename} config file`);
-    this.logger.debug(`Loaded config:\n${JSON.stringify(config, null, 2)}`);
+    this.logger.debug(`Loaded config:\n${JSON.stringify(config.options, null, 2)}`);
 
     container.bind(TSCONFIG).toConstantValue(config);
-  }
-
-  // Properties
-  get cwd(): string {
-    if (container.isBoundNamed(Workspace, CURRENT)) {
-      const wks = container.getNamed(Workspace, CURRENT);
-      return wks.cwd;
-    }
-
-    return process.cwd();
   }
 }
