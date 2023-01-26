@@ -1,10 +1,9 @@
-import { type Logger, Service } from '@jujulego/jill';
+import { Logger, Service } from '@jujulego/jill';
 import { inject } from 'inversify';
 import {
   DiagnosticCategory,
   type DiagnosticMessageChain,
   type DiagnosticRelatedInformation,
-  getLineAndCharacterOfPosition
 } from 'typescript';
 import chalk from 'chalk';
 
@@ -13,11 +12,13 @@ import path from 'node:path';
 
 // Service
 @Service()
-export class DiagnosticService {
+export class TsDiagnosticService {
   // Constructor
   constructor(
     @inject(ContextService)
     private readonly context: ContextService,
+    @inject(Logger)
+    private readonly logger: Logger,
   ) {}
   
   // Methods
@@ -27,9 +28,42 @@ export class DiagnosticService {
     }
 
     const filename = path.relative(this.context.cwd, diagnostic.file.fileName);
-    const { line, character: char } = getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start);
+    const { line, character: char } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
 
-    return chalk.bold(`./${filename}:${line - 1}:${char + 1}`) + ' ';
+    return chalk.bold(`${filename}:${line + 1}:${char + 1}`) + ' ';
+  }
+
+  private _formatLine(line: number | null, max: number): string {
+    const width = max.toString().length;
+    const txt = line === null ? '' : line.toString();
+
+    return chalk.grey(' '.repeat(width - txt.length) + txt + ' |');
+  }
+
+  private _extractFileLines(diagnostic: DiagnosticRelatedInformation): string {
+    if (!diagnostic.file || !diagnostic.start) {
+      return '';
+    }
+
+    // Compute lines
+    const pos = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+    const firstLine = Math.max(pos.line - 2, 0);
+    const lastLine = Math.min(pos.line + 3, diagnostic.file.getLineAndCharacterOfPosition(diagnostic.file.end).line);
+
+    const result: string[] = [];
+
+    for (let line = firstLine; line < lastLine; ++line) {
+      const start = diagnostic.file.getPositionOfLineAndCharacter(line, 0);
+      const end = diagnostic.file.getLineEndOfPosition(start);
+
+      result.push(`${this._formatLine(line + 1, lastLine)} ${chalk.reset(diagnostic.file.text.slice(start, end))}`);
+
+      if (line === pos.line) {
+        result.push(`${this._formatLine(null, lastLine)} ${' '.repeat(pos.character)}${'^'.repeat(diagnostic.length ?? 1)}`);
+      }
+    }
+
+    return result.join('\n');
   }
 
   private _formatMessage(diagnostic: DiagnosticRelatedInformation | DiagnosticMessageChain): string {
@@ -67,15 +101,19 @@ export class DiagnosticService {
     if (typeof diagnostic.messageText === 'string') {
       message += this._formatMessage(diagnostic);
     } else {
-      for (const msg of this._formatChain(diagnostic.messageText)) {
-        message += msg + '\n';
-      }
+      message += Array.from(this._formatChain(diagnostic.messageText)).join('\n');
+    }
+
+    const lines = this._extractFileLines(diagnostic);
+
+    if (lines) {
+      message += '\n' + this._extractFileLines(diagnostic);
     }
 
     return message;
   }
 
-  log(logger: Logger, diagnostic: DiagnosticRelatedInformation): void {
+  log(diagnostic: DiagnosticRelatedInformation, logger: Logger = this.logger): void {
     const message = this.format(diagnostic);
 
     switch (diagnostic.category) {

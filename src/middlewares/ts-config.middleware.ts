@@ -4,7 +4,7 @@ import * as ts from 'typescript';
 import { type ArgumentsCamelCase, type Argv } from 'yargs';
 
 import { ContextService } from '@/src/context.service';
-import { DiagnosticService } from '@/src/typescript/diagnostic.service';
+import { TsDiagnosticService } from '@/src/typescript/ts-diagnostic.service';
 
 // Types
 export interface ILoadTsconfigArgs {
@@ -21,7 +21,7 @@ export function LazyTsconfig() {
 
 // Middleware
 @Middleware()
-export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
+export class TsConfigMiddleware implements IMiddleware<ILoadTsconfigArgs> {
   // Attributes
   private readonly logger: Logger;
 
@@ -31,8 +31,8 @@ export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
     logger: Logger,
     @inject(ContextService)
     private readonly context: ContextService,
-    @inject(DiagnosticService)
-    private readonly diagnostics: DiagnosticService,
+    @inject(TsDiagnosticService)
+    private readonly diagnostics: TsDiagnosticService,
   ) {
     this.logger = logger.child({ label: 'tsconfig' });
   }
@@ -62,7 +62,7 @@ export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
     const file = ts.readConfigFile(filename, ts.sys.readFile);
 
     if (file.error) {
-      this.diagnostics.log(this.logger, file.error);
+      this.diagnostics.log(file.error, this.logger);
       return process.exit(1);
     }
 
@@ -71,7 +71,7 @@ export class LoadTsconfig implements IMiddleware<ILoadTsconfigArgs> {
 
     if (config.errors.length > 0) {
       for (const err of config.errors) {
-        this.diagnostics.log(this.logger, err);
+        this.diagnostics.log(err, this.logger);
       }
 
       if (config.errors.some(err => err.category === ts.DiagnosticCategory.Error)) {

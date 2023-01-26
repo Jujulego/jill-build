@@ -106,5 +106,8 @@
       "module": "commonjs"
     },
     "swc": true
-  }
+  },
+  "exclude": [
+    "files/*"
+  ]
 }

@@ -1,3 +1,3 @@
-export default function simple(a: number, b: number) {
+export default function simple(a: boolean, b: number): number {
   return a + b;
 }
