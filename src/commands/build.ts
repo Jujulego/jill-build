@@ -1,12 +1,22 @@
-import { Command, type ICommand, lazyCurrentWorkspace, LoadProject, LoadWorkspace, type Workspace } from '@jujulego/jill';
+import {
+  Command, container,
+  type ICommand,
+  LazyCurrentWorkspace, lazyInject,
+  LoadProject,
+  LoadWorkspace,
+  TASK_MANAGER,
+  type Workspace
+} from '@jujulego/jill';
 import { inject } from 'inversify';
 import { type ArgumentsCamelCase, type Argv } from 'yargs';
 import * as swc from '@swc/core';
-import * as ts from 'typescript';
 import path from 'node:path';
 
-import { LazyTsconfig, TsConfigMiddleware } from '@/src/middlewares/ts-config.middleware';
+import { TsConfigMiddleware } from '@/src/middlewares/ts-config.middleware';
 import { TsDiagnosticService } from '@/src/typescript/ts-diagnostic.service';
+import { TsBuildFactory, TsBuildTask } from '@/src/typescript/ts-build.task';
+import { TaskManager } from '@jujulego/tasks';
+import { waitForEvent } from '@jujulego/event-tree';
 
 // Types
 export interface IBuildCommandArgs {
@@ -21,10 +31,10 @@ export interface IBuildCommandArgs {
 })
 export class BuildCommand implements ICommand<IBuildCommandArgs> {
   // Lazy injections
-  @LazyTsconfig()
-  readonly tsconfig: ts.ParsedCommandLine;
+  @lazyInject(TASK_MANAGER)
+  readonly manager: TaskManager;
 
-  @lazyCurrentWorkspace()
+  @LazyCurrentWorkspace()
   readonly workspace: Workspace;
 
   // Constructor
@@ -47,23 +57,9 @@ export class BuildCommand implements ICommand<IBuildCommandArgs> {
     });
     console.log(res);
 
-    // Build using ts ==> https://github.com/microsoft/TypeScript/wiki/Using-the-Compiler-API
-    this.tsconfig.options.noEmit = false;
-    this.tsconfig.options.emitDeclarationOnly = true;
+    const task = container.get(TsBuildFactory)();
+    this.manager.add(task);
 
-    const host = ts.createCompilerHost(this.tsconfig.options);
-    host.writeFile = (filename, contents) => console.log({ filename, contents }); // <= file data
-
-    const program = ts.createProgram(this.tsconfig.fileNames, this.tsconfig.options, host);
-    // console.log(program.emit());
-
-    // console.log(program.getGlobalDiagnostics());
-    // console.log(program.getSyntacticDiagnostics());
-
-    for (const err of program.getSemanticDiagnostics()) {
-      this.diagnotics.log(err);
-    }
-
-    // console.log(program.getDeclarationDiagnostics());
+    await waitForEvent(task, 'completed');
   }
 }
