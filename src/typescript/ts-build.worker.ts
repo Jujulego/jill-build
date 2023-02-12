@@ -7,21 +7,25 @@ import * as ts from 'typescript';
 import { TsDiagnosticService } from '@/src/typescript/ts-diagnostic.service';
 
 // Worker
+
+@injectable()
 class TsBuildWorker extends WorkerHandler {
   // Attributes
-  private readonly tsconfig = wt.workerData;
-  // private readonly logger: Logger;
+  private readonly tsconfig: ts.ParsedCommandLine = wt.workerData;
+  private readonly logger: Logger;
 
   // Constructor
-  // constructor(
-  //   @inject(Logger)
-  //   logger: Logger,
-  // ) {
-  //   super();
-  //
-  //   this.logger = logger.child({ label: 'typescript' });
-  //   this.logger.verbose(`worker started in thread #${wt.threadId}`);
-  // }
+  constructor(
+    @inject(Logger)
+    logger: Logger,
+    @inject(TsDiagnosticService)
+    private readonly diagnostics: TsDiagnosticService,
+  ) {
+    super();
+
+    this.logger = logger.child({ label: 'ts-build' });
+    this.logger.verbose(`worker started in thread #${wt.threadId}`);
+  }
 
   // Methods
   protected async _run(payload: unknown): Promise<void> {
@@ -40,7 +44,8 @@ class TsBuildWorker extends WorkerHandler {
       // console.log(program.getSyntacticDiagnostics());
 
       for (const err of program.getSemanticDiagnostics()) {
-        this.emit(err);
+        this.diagnostics.log(err);
+      //   this.emit(err);
       }
 
       // console.log(program.getDeclarationDiagnostics());
@@ -51,5 +56,8 @@ class TsBuildWorker extends WorkerHandler {
   }
 }
 
-const task = new TsBuildWorker();
-task.init();
+decorate(injectable(), WorkerHandler);
+
+container.bind(TsBuildWorker).toSelf();
+
+(await container.getAsync(TsBuildWorker)).init();

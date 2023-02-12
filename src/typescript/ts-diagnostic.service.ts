@@ -6,8 +6,6 @@ import {
   type DiagnosticRelatedInformation,
 } from 'typescript';
 import chalk from 'chalk';
-
-import { ContextService } from '@/src/context.service';
 import path from 'node:path';
 
 // Service
@@ -15,8 +13,6 @@ import path from 'node:path';
 export class TsDiagnosticService {
   // Constructor
   constructor(
-    @inject(ContextService)
-    private readonly context: ContextService,
     @inject(Logger)
     private readonly logger: Logger,
   ) {}
@@ -27,7 +23,7 @@ export class TsDiagnosticService {
       return '';
     }
 
-    const filename = path.relative(this.context.cwd, diagnostic.file.fileName);
+    const filename = path.relative(process.cwd(), diagnostic.file.fileName);
     const { line, character: char } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
 
     return chalk.bold(`${filename}:${line + 1}:${char + 1}`) + ' ';

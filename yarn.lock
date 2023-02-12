@@ -194,23 +194,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/jill@npm:2.2.0-alpha.3":
+"@jujulego/jill@file:../jill::locator=jill-build%40workspace%3A.":
   version: 2.2.0-alpha.3
-  resolution: "@jujulego/jill@npm:2.2.0-alpha.3"
+  resolution: "@jujulego/jill@file:../jill#../jill::hash=df9a69&locator=jill-build%40workspace%3A."
   bin:
     jill: ./bin/jill.js
-  checksum: fb7c5a3a8861f764405c5c50a0307712f0a755a7087ee390bb5d72d7f1c13cb95aeaad3e2678aebb7477bac13a611a019e64683c23b3978b847e3c4528c9a682
+  checksum: 14d86b9ddf25fd799acaf56466936b40340e76d9a72d39c2a2c4a65ade155c486f72bd8f40eaa4721e14477d4e03aac1f325c1bc428a03aa2a9806d26739284a
   languageName: node
   linkType: hard
 
-"@jujulego/tasks@npm:1.2.0":
-  version: 1.2.0
-  resolution: "@jujulego/tasks@npm:1.2.0"
+"@jujulego/tasks@npm:1.2.1":
+  version: 1.2.1
+  resolution: "@jujulego/tasks@npm:1.2.1"
   dependencies:
     "@jujulego/event-tree": ^1.1.1
     "@jujulego/utils": ^1.0.1
     tree-kill: ^1.2.2
-  checksum: ba76fd9f1ad0754096e48d0fca2df6a99641ccace26464bb836e3ec9f21d63efd741aafd3eea84e29fa0f9265632903bc40c4208e870d844886aa69b9206c99e
+  checksum: 0dff36db6e9664d0d2ad6cbfde2b7b2c75a1e421598933de2840e8f29b58c8f64963b3bd1b502e6ac060b77c7029307d327af65dd313c9e76a759a89974a9984
   languageName: node
   linkType: hard
 
@@ -2573,8 +2573,8 @@ __metadata:
   resolution: "jill-build@workspace:."
   dependencies:
     "@jujulego/event-tree": 1.1.1
-    "@jujulego/jill": 2.2.0-alpha.3
-    "@jujulego/tasks": 1.2.0
+    "@jujulego/jill": "file:../jill"
+    "@jujulego/tasks": 1.2.1
     "@swc/core": 1.3.24
     "@types/node": 16.18.12
     "@types/react": 17.0.53

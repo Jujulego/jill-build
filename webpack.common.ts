@@ -23,6 +23,9 @@ const commonConfig: Configuration = {
       chunks: 'all'
     }
   },
+  experiments: {
+    topLevelAwait: true,
+  },
   module: {
     rules: [
       {

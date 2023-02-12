@@ -50,15 +50,15 @@ export class BuildCommand implements ICommand<IBuildCommandArgs> {
   }
 
   async handler(args: ArgumentsCamelCase<IBuildCommandArgs>) {
+    const task = container.get(TsBuildFactory)();
+    this.manager.add(task);
+
     // Build using swc :
     const res = await swc.transformFile(path.resolve(this.workspace.cwd, args.file), {
       cwd: this.workspace.cwd,
       outputPath: path.resolve(this.workspace.cwd, 'dist'),
     });
-    console.log(res);
-
-    const task = container.get(TsBuildFactory)();
-    this.manager.add(task);
+    // console.log(res);
 
     await waitForEvent(task, 'completed');
   }

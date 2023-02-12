@@ -1,13 +1,13 @@
+import { Service } from '@jujulego/jill';
 import { WorkerPool } from '@jujulego/tasks';
 import { decorate, injectable, unmanaged } from 'inversify';
 import { Worker } from 'node:worker_threads';
 import type * as ts from 'typescript';
 
 import { LazyTsconfig } from '@/src/middlewares/ts-config.middleware';
-import { container } from '@jujulego/jill';
 
 // Pool
-@injectable()
+@Service()
 export class TsBuildPool extends WorkerPool {
   // Attributes
   @LazyTsconfig()
@@ -29,5 +29,3 @@ export class TsBuildPool extends WorkerPool {
 // Bind
 decorate(injectable(), WorkerPool);
 decorate(unmanaged(), WorkerPool, 0);
-
-container.bind(TsBuildPool).toSelf().inSingletonScope();
