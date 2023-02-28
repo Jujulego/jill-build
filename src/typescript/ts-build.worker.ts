@@ -4,20 +4,24 @@ import { decorate, inject, injectable } from 'inversify';
 import wt from 'node:worker_threads';
 import * as ts from 'typescript';
 
+import { TSCONFIG } from '@/src/middlewares/ts-config.middleware';
 import { TsDiagnosticService } from '@/src/typescript/ts-diagnostic.service';
 
-// Worker
+// Setup
+container.bind(TSCONFIG).toConstantValue(wt.workerData);
 
+// Worker
 @injectable()
 class TsBuildWorker extends WorkerHandler {
   // Attributes
-  private readonly tsconfig: ts.ParsedCommandLine = wt.workerData;
   private readonly logger: Logger;
 
   // Constructor
   constructor(
     @inject(Logger)
     logger: Logger,
+    @inject(TSCONFIG)
+    private readonly tsconfig: ts.ParsedCommandLine,
     @inject(TsDiagnosticService)
     private readonly diagnostics: TsDiagnosticService,
   ) {
