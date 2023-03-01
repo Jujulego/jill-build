@@ -14,8 +14,8 @@ import path from 'node:path';
 
 import { TsConfigMiddleware } from '@/src/middlewares/ts-config.middleware';
 import { TsDiagnosticService } from '@/src/typescript/ts-diagnostic.service';
-import { TsBuildFactory, TsBuildTask } from '@/src/typescript/ts-build.task';
-import { TaskManager } from '@jujulego/tasks';
+import { TsBuildFactory } from '@/src/typescript/ts-build.task';
+import { type TaskManager } from '@jujulego/tasks';
 import { waitForEvent } from '@jujulego/event-tree';
 
 // Types
@@ -50,7 +50,7 @@ export class BuildCommand implements ICommand<IBuildCommandArgs> {
   }
 
   async handler(args: ArgumentsCamelCase<IBuildCommandArgs>) {
-    const task = container.get(TsBuildFactory)();
+    const task = container.get(TsBuildFactory)([args.file]);
     this.manager.add(task);
 
     // Build using swc :
