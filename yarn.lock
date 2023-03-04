@@ -194,12 +194,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jujulego/jill@npm:2.2.0-alpha.5":
-  version: 2.2.0-alpha.5
-  resolution: "@jujulego/jill@npm:2.2.0-alpha.5"
+"@jujulego/jill@npm:2.2.0-alpha.6":
+  version: 2.2.0-alpha.6
+  resolution: "@jujulego/jill@npm:2.2.0-alpha.6"
   bin:
     jill: ./bin/jill.js
-  checksum: d5bfeef42e730fe08e670fd534f01c63728171ee3176960b1bbf63fcccd787dcda6df76eb5be5f8ff08160e74c510abbdc081b79c8d58d9712fc82b00343c147
+  checksum: 0c5eea2b7abc5717ea0020d49bb898755d8999143f80bdfe9d97db05dcca801bbbe867f8a84c68f7a55774180b2afcd7aaa9291ecbeae2ec5b9a429c5121db37
   languageName: node
   linkType: hard
 
@@ -2573,7 +2573,7 @@ __metadata:
   resolution: "jill-build@workspace:."
   dependencies:
     "@jujulego/event-tree": 1.1.1
-    "@jujulego/jill": 2.2.0-alpha.5
+    "@jujulego/jill": 2.2.0-alpha.6
     "@jujulego/tasks": 1.2.1
     "@swc/core": 1.3.24
     "@types/node": 16.18.12
