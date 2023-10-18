@@ -9,7 +9,7 @@
     "url": "https://github.com/Jujulego/jill-build"
   },
   "engines": {
-    "node": "^16"
+    "node": "^18.0.0"
   },
   "files": [
     "bin",
@@ -35,7 +35,7 @@
     "@jujulego/jill": "2.2.0-alpha.5",
     "@jujulego/tasks": "1.2.1",
     "@swc/core": "1.3.24",
-    "@types/node": "16.18.12",
+    "@types/node": "18.18.6",
     "@types/react": "17.0.53",
     "@types/webpack-bundle-analyzer": "4.6.0",
     "@types/yargs": "17.0.22",
