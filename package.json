@@ -9,7 +9,7 @@
     "url": "https://github.com/Jujulego/jill-build"
   },
   "engines": {
-    "node": "^16"
+    "node": "^22.0.0"
   },
   "files": [
     "bin",
