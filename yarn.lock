@@ -535,12 +535,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/yargs@npm:17.0.22":
-  version: 17.0.22
-  resolution: "@types/yargs@npm:17.0.22"
+"@types/yargs@npm:17.0.35":
+  version: 17.0.35
+  resolution: "@types/yargs@npm:17.0.35"
   dependencies:
     "@types/yargs-parser": "*"
-  checksum: 0773523fda71bafdc52f13f5970039e535a353665a60ba9261149a5c9c2b908242e6e77fbb7a8c06931ec78ce889d64d09673c68ba23eb5f5742d5385d0d1982
+  checksum: ebf1f5373388cfcbf9cfb5e56ce7a77c0ba2450420f26f3701010ca92df48cce7e14e4245ed1f17178a38ff8702467a6f4047742775b8e2fd06dec8f4f3501ce
   languageName: node
   linkType: hard
 
@@ -2579,7 +2579,7 @@ __metadata:
     "@types/node": 16.18.12
     "@types/react": 17.0.53
     "@types/webpack-bundle-analyzer": 4.6.0
-    "@types/yargs": 17.0.22
+    "@types/yargs": 17.0.35
     "@typescript-eslint/eslint-plugin": 5.50.0
     "@typescript-eslint/parser": 5.50.0
     chalk: 5.2.0
